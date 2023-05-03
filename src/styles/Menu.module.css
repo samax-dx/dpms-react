@@ -1,0 +1,3 @@
+:global(.ant-menu li.parent-link:not(.ant-menu-submenu-selected) a) {
+    color: initial;
+}

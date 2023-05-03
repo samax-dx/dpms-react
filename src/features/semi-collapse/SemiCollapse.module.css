@@ -1,0 +1,21 @@
+:global(.semi-collapse) {
+    position: relative;
+    overflow: hidden;
+}
+
+:global(.semi-collapse .toggle-box) {
+    background-color: transparent;
+}
+
+:global(.semi-collapse .ant-checkbox) {
+    display: none;
+}
+
+:global(.semi-collapse:not(.open)::before) {
+    content: ' ';
+    height: 25px;
+    background-image: linear-gradient(to bottom, #fff, #ddd);
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+}

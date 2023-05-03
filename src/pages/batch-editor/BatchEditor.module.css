@@ -1,0 +1,28 @@
+.header {
+    background-color: lightblue;
+}
+
+.content {
+    min-height: 100vh;
+}
+
+.batchCard {
+    box-shadow: 0 0 1px 0 #000 !important;
+    border-radius: 4px;
+}
+
+.batchCard li {
+    align-items: stretch !important;
+}
+
+.batchCard:not(:first-child) {
+    margin-top: 20px;
+}
+
+.batchCard :global(.ant-card-body) {
+    padding: 0;
+}
+
+.batchCard :global(.ant-card-body) > li {
+    padding: 0;
+}

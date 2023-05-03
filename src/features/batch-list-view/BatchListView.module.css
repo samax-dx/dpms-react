@@ -1,0 +1,15 @@
+.batchCard {
+    box-shadow: 0 0 1px 0 #000 !important;
+}
+
+.batchCard:not(:first-child) {
+    margin-top: 20px;
+}
+
+.batchCard :global(.ant-card-body) {
+    padding: 0;
+}
+
+.batchCard :global(.ant-descriptions) {
+    padding: 8px 10px;
+}
