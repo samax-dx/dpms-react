@@ -9,23 +9,23 @@ import { MainNav } from '../../features/navs/MainNav';
 import { BatchEditForm } from '../../features/batch-edit-form/BatchEditForm';
 import { BatchListView } from '../../features/batch-list-view/BatchListView';
 import { useSaveBatch } from '../../services/BatchRepository';
-import { BatchCreateWizardReactions, useBatchCreateWizardActions } from '../../services/BatchCreateWizard';
+import { useBatchCreateWizardActions } from '../../services/BatchCreateWizard';
 
 
 export const BatchCreator = () => {
-    BatchCreateWizardReactions.useResetBatchState();
-
     const [saveState] = useSaveBatch();
     const [createdItems, setCreatedItems] = useState([]);
-    const { finishCreateBatch } = useBatchCreateWizardActions();
+    const { finishEdit, resetBatchState } = useBatchCreateWizardActions();
 
     useEffect(() => {
         if (!saveState.complete || saveState.data instanceof Error) {
             return;
         }
-        finishCreateBatch();
+        finishEdit();
         setCreatedItems([...createdItems, saveState.data]);
     }, [saveState]);
+
+    useEffect(() => resetBatchState, []);
 
     return (
         <Layout>

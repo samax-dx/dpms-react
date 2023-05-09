@@ -8,7 +8,7 @@ import dayjs from 'dayjs';
 
 
 export const BatchListView = ({ items: managedList, className, render: renderActionbar }) => {
-    var [batchListLoadable, setBatchQueryFilter] = useBatchList();
+    var [batchListLoadable, setBatchQueryFilter] = useBatchList();console.log(batchListLoadable);
     managedList && (batchListLoadable = { contents: managedList, state: "hasValue" });
 
     useEffect(() => setBatchQueryFilter(""), []);

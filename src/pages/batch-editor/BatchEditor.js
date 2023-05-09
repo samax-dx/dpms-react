@@ -1,6 +1,6 @@
 import mcss from './BatchEditor.module.css';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Button, Card, Col, Layout, Modal, Row } from 'antd';
 import { BasicLogo } from '../../features/logos/BasicLogo';
@@ -8,15 +8,18 @@ import { HeaderButtonPv } from '../../features/profile-viewers/HeaderButtonPv';
 import { MainNav } from '../../features/navs/MainNav';
 import { BatchEditForm } from '../../features/batch-edit-form/BatchEditForm';
 import { BatchListView } from '../../features/batch-list-view/BatchListView';
-import { BatchCreateWizardReactions } from '../../services/BatchCreateWizard';
+import { useBatchCreateWizardActions } from '../../services/BatchCreateWizard';
 
 
 export const BatchEditor = () => {
     const [editItem, setEditItem] = useState({ batchProcesses: [] });
-    BatchCreateWizardReactions.useRestoreBatchState(editItem, editItem.batchProcesses);
+    const { restoreBatchState, resetBatchState } = useBatchCreateWizardActions();
 
     const openEditor = item => setEditItem(item);
     const closeEditor = () => setEditItem({ batchProcesses: [] });
+
+    useEffect(() => restoreBatchState(editItem, editItem.batchProcesses), [editItem]);
+    useEffect(() => resetBatchState, []);
 
     return (
         <Layout>
@@ -35,7 +38,7 @@ export const BatchEditor = () => {
                             render={item => {
                                 return (
                                     <Button
-                                        onClick={_ => openEditor(item)}
+                                        onClick={_ => console.log(item) || openEditor(item)}
                                         style={{ height: "100%" }}
                                         children="Edit"
                                     />

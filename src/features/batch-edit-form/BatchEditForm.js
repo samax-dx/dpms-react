@@ -1,11 +1,15 @@
 import mcss from './BatchEditForm.module.css';
 
 import React, { useEffect, useState } from 'react';
-import { Button, Card, Col, Descriptions, Form, Input, Row, Select, Space, Spin, Typography, notification } from "antd";
-import { PicCenterOutlined, PicLeftOutlined, PicRightOutlined, BlockOutlined, BuildOutlined, CompressOutlined } from '@ant-design/icons';
+import { useRecoilValue } from 'recoil';
+import * as R from 'ramda';
+import { Button, Card, Col, Descriptions, Form, Input, Row, Space, Spin, Typography, notification } from "antd";
+import { PicCenterOutlined, PicLeftOutlined, PicRightOutlined, BlockOutlined, BuildOutlined, CompressOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { useSaveBatch } from '../../services/BatchRepository';
 import { useBatchCreateWizardActions, useBatchCreateWizardConditions, useBatchCreateWizardState } from '../../services/BatchCreateWizard';
 import { TileNav } from '../navs/TileNav';
+import { dndDragEndDetailState } from '../../services/BeautifulDnD';
 
 
 const processLabels = {
@@ -85,14 +89,14 @@ const processFormFields = {
     "brushing": null
 };
 
-const ProcessForm = ({ processData, onFinish, className }) => {
+const ProcessForm = ({ processData, onFinish, onCancel, className }) => {
     const [processForm] = Form.useForm();
 
     return (
         <Form
             form={processForm}
             initialValues={processData}
-            onFinish={data => console.log(data) || onFinish(data)}
+            onFinish={onFinish}
             className={className}
             layout='vertical'
             size='small'
@@ -117,6 +121,14 @@ const ProcessForm = ({ processData, onFinish, className }) => {
                         children={"Confirm Save"}
                     />
                 </Form.Item>
+                <Form.Item label={'---------'}>
+                    <Button
+                        type="primary"
+                        size='small'
+                        onClick={onCancel}
+                        children={"Cancel"}
+                    />
+                </Form.Item>
             </Space>
         </Form>
     );
@@ -129,16 +141,17 @@ export const BatchEditForm = () => {
     const { value: wizardState, context: wizardContext } = useBatchCreateWizardState();
 
     const {
-        canOpenAddBatch, canOpenEditBatch, canFinishAddBatch,
-        canOpenAddProcess, canOpenEditProcess, canFinishAddProcess,
-        canFinishCreateBatch } = useBatchCreateWizardConditions();
+        canOpenEditBatch, canFinishEditBatch, hasFinishedEditBatch,
+        canOpenEditProcess, canFinishEditProcess, hasFinishedEditProcess,
+        canFinishEdit } = useBatchCreateWizardConditions();
 
     const {
-        openAddBatch, openEditBatch, finishAddBatch,
-        openAddProcess, openEditProcess, finishAddProcess
+        openEditBatch, finishEditBatch,
+        openEditProcess, finishEditProcess,
+        restoreBatchState
     } = useBatchCreateWizardActions();
 
-    const [editingProcessId, setEditingProcessId] = useState(null);
+    const dragEndState = useRecoilValue(dndDragEndDetailState);
 
     useEffect(() => {
         if (!saveState.complete) return;
@@ -162,50 +175,85 @@ export const BatchEditForm = () => {
         }
     }, [saveState]);
 
+    useEffect(() => {
+        const { source, destination } = dragEndState.result;
+        const syncBatchList = list => restoreBatchState(wizardContext.batchData, list);
+        destination && syncBatchList(R.move(source.index, destination.index, wizardContext.processList));
+    }, [dragEndState]);
+
     return (
         <Spin spinning={saveState.loading}>
             <Row gutter={[12, 12]}>
                 <Col md={12} sm={24}>
                     <Card cover={<Typography.Text style={{ paddingTop: 10, textAlign: "center" }} strong underline>Input Wizard</Typography.Text>}>
                         <div>
-                            {Object.keys(wizardContext.batchData).length ? <Descriptions layout="vertical" bordered key={`process0`} size="small" column={5}>
-                                <Descriptions.Item label="Batch No.">{wizardContext.batchData.batchId}</Descriptions.Item>
-                                <Descriptions.Item label="Buyer Name">{wizardContext.batchData.buyerName}</Descriptions.Item>
-                                <Descriptions.Item label="FAB. Qty (kg)">{wizardContext.batchData.fabricsQuantity}</Descriptions.Item>
-                                <Descriptions.Item label="FAB. Type">{wizardContext.batchData.fabricType}</Descriptions.Item>
-                                <Descriptions.Item label="Req. GSM">{wizardContext.batchData.requiredGsm}</Descriptions.Item>
-                            </Descriptions> : null}
+                            {wizardContext.batchData.batchId ? <Space.Compact block>
+                                <Descriptions layout="vertical" style={{ flexGrow: 1 }} bordered key={`process0`} size="small" column={5}>
+                                    <Descriptions.Item label="Batch No.">{wizardContext.batchData.batchId}</Descriptions.Item>
+                                    <Descriptions.Item label="Buyer Name">{wizardContext.batchData.buyerName}</Descriptions.Item>
+                                    <Descriptions.Item label="FAB. Qty (kg)">{wizardContext.batchData.fabricsQuantity}</Descriptions.Item>
+                                    <Descriptions.Item label="FAB. Type">{wizardContext.batchData.fabricType}</Descriptions.Item>
+                                    <Descriptions.Item label="Req. GSM">{wizardContext.batchData.requiredGsm}</Descriptions.Item>
+                                </Descriptions>
+                                <Space.Compact direction='vertical'>
+                                    <Button icon={<EditOutlined />} onClick={() => openEditBatch(wizardContext.batchData)} />
+                                    <Button icon={<DeleteOutlined />} disabled />
+                                </Space.Compact>
+                            </Space.Compact> : null}
                             <br />
                         </div>
-                        {wizardContext.processList.map((processData, i) => (<div key={`process${i + 1}`}>
-                            <Descriptions layout="vertical" bordered size="small" column={5}>{Object.entries(processData).filter(([k]) => k !== "batchProcessId").slice(0, 5).map(([k, v], i) =>
-                                <Descriptions.Item label={processParamLabels[k]} key={`pdp-i${i}`}>{processLabels[v] || v}</Descriptions.Item>
-                            )}</Descriptions>
-                            <br />
-                        </div>))}
+                        {wizardContext.processList.length > 0 ? <Droppable droppableId={"process_list"}>
+                            {ddHelper => (
+                                <div {...ddHelper.droppableProps} ref={ddHelper.innerRef} >
+                                    {wizardContext.processList.map((procData, i) => (
+                                        <Draggable key={`pr_k${i}`} draggableId={`pr_i${i}`} index={i}>
+                                            {ddHelper => (
+                                                <div {...ddHelper.draggableProps} {...ddHelper.dragHandleProps} ref={ddHelper.innerRef}>
+                                                    <div style={{ display: procData.__new || procData.__deleted ? "none" : undefined }}>
+                                                        <Space.Compact block>
+                                                            <Descriptions layout="vertical" size="small" column={5} bordered style={{ flexGrow: 1 }}>
+                                                                <Descriptions.Item label={"#"} key={`pdi-i${i}`} style={{ width: 10 }}>{i + 1}</Descriptions.Item>
+                                                                {Object.entries(procData).filter(([k]) => !["batchProcessId", "processOrder", "__deleted", "__new"].includes(k)).slice(0, 5).map(([k, v], i) => (
+                                                                    <Descriptions.Item label={processParamLabels[k]} key={`pdp-i${i}`}>{processLabels[v] || v}</Descriptions.Item>
+                                                                ))}
+                                                            </Descriptions>
+                                                            <Space.Compact direction='vertical'>
+                                                                <Button icon={<EditOutlined />} onClick={() => openEditProcess(procData, i)} />
+                                                                <Button icon={<DeleteOutlined />} onClick={() => restoreBatchState(wizardContext.batchData, procData.batchProcessId ? R.move(i, wizardContext.processList.length, { ...procData, __deleted: true }, wizardContext.processList) : R.remove(i, 1, wizardContext.processList))} />
+                                                            </Space.Compact>
+                                                        </Space.Compact>
+                                                        <br />
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </Draggable>
+                                    ))}
+                                    {ddHelper.placeholder}
+                                </div>
+                            )}
+                        </Droppable> : null}
                         <Space className="justify-center">
-                            <Button type='primary' disabled={!canOpenAddBatch()} onClick={openAddBatch}>Add Batch Data</Button>
-                            <Button type='primary' disabled={!canOpenAddProcess()} onClick={openAddProcess}>Add Process</Button>
-                            <Button type='primary' disabled={!canFinishCreateBatch()} onClick={() => {
-                                const batch = { ...wizardContext.batchData, batchProcesses: wizardContext.processList };
-                                saveBatch(batch);
-                            }}>Save & Create Batch</Button>
+                            <Button type='primary' disabled={!!wizardContext.batchData.batchId} onClick={() => openEditBatch({ processList: [] })}>Add Batch Data</Button>
+                            <Button type='primary' disabled={!canOpenEditProcess()} onClick={() => openEditProcess({ __new: true }, wizardContext.processList.length)}>Add Process</Button>
+                            <Button type='primary' disabled={!canFinishEdit()} onClick={() => saveBatch({ ...wizardContext.batchData, batchProcesses: wizardContext.processList })}>
+                                {!!wizardContext.batchData.createdOn ? "Update & Save Batch" : "Save & Create Batch"}
+                            </Button>
                         </Space>
                     </Card>
                 </Col>
-                {wizardState.addBatch || wizardState.editBatch ? <Col md={12} sm={24}>
+                {wizardState.editBatch ? <Col md={12} sm={24}>
                     <Card cover={<Typography.Text style={{ paddingTop: 10, textAlign: "center" }} strong underline>Batch Data</Typography.Text>}>
                         <Form
                             form={batchForm}
-                            initialValues={wizardContext.batchData}
-                            onFinish={finishAddBatch}
+                            initialValues={wizardContext.batchData.batchId ? wizardContext.batchData : { ...wizardContext.batchData, batchId: Date.now() }}
+                            onFinish={finishEditBatch}
                             className={mcss.batchForm}
                             layout='vertical'
                             size='small'
                         >
                             <Descriptions size='small'>
                                 <Descriptions.Item>
-                                    <Form.Item rules={[{ required: true }]} name={"batchId"} label="Batch No" children={<Input readOnly />} initialValue={wizardContext.batchData.batchId ? wizardContext.batchData.batchId : Date.now()} />
+                                    <Form.Item rules={[{ required: true }]} name={"batchId"} label="Batch No" children={<Input readOnly />} />
                                 </Descriptions.Item>
                                 <Descriptions.Item>
                                     <Form.Item rules={[{ required: true }]} name={"buyerName"} label="Buyer Name" children={<Input />} />
@@ -261,12 +309,20 @@ export const BatchEditForm = () => {
                                             children={"Confirm Save"}
                                         />
                                     </Form.Item>
+                                    <Form.Item label={'---------'}>
+                                        <Button
+                                            type="primary"
+                                            size='small'
+                                            onClick={() => restoreBatchState(wizardContext.batchData, wizardContext.processList)}
+                                            children={"Cancel"}
+                                        />
+                                    </Form.Item>
                                 </Descriptions.Item>
                             </Descriptions>
                         </Form>
                     </Card>
                 </Col> : null}
-                {wizardState.addProcess || wizardState.editProcess ? <Col md={12} sm={24}>
+                {wizardState.editProcess ? <Col md={12} sm={24}>
                     <Card
                         cover={<Typography.Text
                             style={{ paddingTop: 10, textAlign: "center" }}
@@ -275,7 +331,7 @@ export const BatchEditForm = () => {
                             children="Process Data" />}
                     >
                         <TileNav
-                            onChange={setEditingProcessId}
+                            onChange={processId => openEditProcess({ ...wizardContext.processList[wizardContext.editIndex], processId }, wizardContext.editIndex)}
                             items={[
                                 { icon: <PicCenterOutlined />, text: "Squeezer", data: "squeezer" },
                                 { icon: <PicLeftOutlined />, text: "Drying", data: "drying" },
@@ -284,13 +340,17 @@ export const BatchEditForm = () => {
                                 { icon: <BuildOutlined />, text: "Compacting", data: "compacting" },
                                 { icon: <CompressOutlined />, text: "Brushing", data: "brushing" }
                             ]}
+                            selectedItem={wizardContext.processList[wizardContext.editIndex].processId}
+                            editable={wizardContext.processList[wizardContext.editIndex].__new}
+                            onCancel={() => restoreBatchState(wizardContext.batchData, wizardContext.processList)}
                         />
                         <br />
-                        {editingProcessId && <ProcessForm
-                            processData={{ ...wizardContext.processData, processId: editingProcessId }}
-                            onFinish={finishAddProcess}
-                            className={mcss.batchForm}
-                        />}
+                        {wizardContext.editIndex >= 0 && wizardContext.processList[wizardContext.editIndex].processId ? <ProcessForm
+                            processData={{ ...wizardContext.processList[wizardContext.editIndex] }}
+                            onFinish={procData => finishEditProcess({ ...procData, __new: undefined })}
+                            onCancel={() => restoreBatchState(wizardContext.batchData, wizardContext.processList)}
+                            className={mcss.processForm}
+                        /> : null}
                     </Card>
                 </Col> : null}
                 <Col span={24}>

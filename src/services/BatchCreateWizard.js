@@ -1,21 +1,18 @@
 import { atom, useRecoilState, useRecoilValue } from "recoil";
-import { useEffect } from "react";
 
 
 const STATES = {
     idle: false,
-    addBatch: false,
     editBatch: false,
-    doneAddBatch: false,
-    addProcess: false,
+    doneEditBatch: false,
     editProcess: false,
-    doneAddProcess: false
+    doneEditProcess: false
 };
 
 const CONTEXT = {
     batchData: {},
     processList: [],
-    processData: {}
+    editIndex: -1
 };
 
 /**
@@ -53,13 +50,13 @@ export const useBatchCreateWizardState = () => useRecoilValue(batchPlanState);
 export const useBatchCreateWizardConditions = () => {
     const planState = useRecoilValue(batchPlanState);
     return {
-        canOpenAddBatch: () => planState.value.idle,
-        canOpenEditBatch: () => planState.value.doneAddBatch || planState.value.doneAddProcess,
-        canFinishAddBatch: () => planState.value.addBatch || planState.value.editBatch,
-        canOpenAddProcess: () => planState.value.doneAddBatch || planState.value.doneAddProcess,
-        canOpenEditProcess: () => planState.value.doneAddProcess,
-        canFinishAddProcess: () => planState.value.addProcess || planState.value.editProcess,
-        canFinishCreateBatch: () => planState.value.doneAddProcess
+        canOpenEditBatch: () => planState.value.doneEditBatch || planState.value.doneEditProcess || planState.value.editBatch || planState.value.idle,
+        canFinishEditBatch: () => planState.value.editBatch,
+        hasFinishedEditBatch: () => planState.value.doneEditBatch || planState.value.doneEditProcess,
+        canOpenEditProcess: () => planState.value.doneEditBatch || planState.value.doneEditProcess || planState.value.editProcess,
+        canFinishEditProcess: () => planState.value.editProcess,
+        hasFinishedEditProcess: () => planState.value.doneEditProcess,
+        canFinishEdit: () => planState.value.doneEditBatch || planState.value.doneEditProcess
     };
 };
 
@@ -67,52 +64,39 @@ export const useBatchCreateWizardActions = () => {
     const [planState, setPlanState] = useRecoilState(batchPlanState);
 
     const {
-        canOpenAddBatch, canOpenEditBatch, canFinishAddBatch,
-        canOpenAddProcess, canOpenEditProcess, canFinishAddProcess,
-        canFinishCreateBatch
+        canOpenEditBatch, canFinishEditBatch, hasFinishedEditBatch,
+        canOpenEditProcess, canFinishEditProcess, hasFinishedEditProcess,
+        canFinishEdit
     } = useBatchCreateWizardConditions();
 
     return {
-        openAddBatch: () => {
-            canOpenAddBatch() && setPlanState(newState({ addBatch: true }));
-        },
         openEditBatch: batchData => {
             canOpenEditBatch() && setPlanState(newState({ editBatch: true }, { ...planState.context, batchData }));
         },
-        finishAddBatch: batchData => {
-            canFinishAddBatch() && setPlanState(newState({ doneAddBatch: true }, { ...planState.context, batchData }));
+        finishEditBatch: batchData => {
+            canFinishEditBatch() && setPlanState(newState({ doneEditBatch: true }, { ...planState.context, batchData }));
         },
-        openAddProcess: () => {
-            canOpenAddProcess() && setPlanState(newState({ addProcess: true }, { ...planState.context }));
-        },
-        openEditProcess: processData => {
-            canOpenEditProcess() && setPlanState(newState({ editProcess: true }, { ...planState.context, processData }));
-        },
-        finishAddProcess: processData => {
+        openEditProcess: (processData, editIndex) => {
             const processList = [...planState.context.processList];
-            processList[Math.max(planState.context.processList.findIndex(proc => proc.batchId === processData.batchId), processList.length)] = processData;
+            processList[editIndex] = { ...processData };
 
-            canFinishAddProcess() && setPlanState(newState({ doneAddProcess: true }, { ...planState.context, processList, processData: {} }));
+            canOpenEditProcess() && setPlanState(newState({ editProcess: true }, { ...planState.context, processList, editIndex }));
         },
-        finishCreateBatch: () => {
-            canFinishCreateBatch() && setPlanState(newState());
+        finishEditProcess: (processData) => {
+            const editIndex = planState.context.editIndex;
+            const processList = [...planState.context.processList];
+            processList[editIndex] = { ...processData };
+
+            canFinishEditProcess() && setPlanState(newState({ doneEditProcess: true }, { ...planState.context, processList, editIndex: -1 }));
+        },
+        finishEdit: () => {
+            canFinishEdit() && setPlanState(newState());
         },
         restoreBatchState: (batchData, processList) => {
-            setPlanState(newState({ doneAddBatch: true, doneAddProcess: true }, { batchData, processList }));
+            setPlanState(newState({ idle: !batchData.batchId, doneEditBatch: !!batchData.batchId, doneEditProcess: processList.length > 0 }, { batchData, processList }));
         },
         resetBatchState: () => {
             setPlanState(newState());
         }
     };
-};
-
-export const BatchCreateWizardReactions = {
-    useRestoreBatchState: (batchData, batchProcesses) => {
-        const { restoreBatchState } = useBatchCreateWizardActions();
-        useEffect(() => restoreBatchState(batchData, batchProcesses), [batchData, batchProcesses]);
-    },
-    useResetBatchState: () => {
-        const { resetBatchState } = useBatchCreateWizardActions();
-        useEffect(() => resetBatchState(), []);
-    }
 };
