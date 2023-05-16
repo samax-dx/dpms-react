@@ -219,7 +219,7 @@ export const BatchEditForm = () => {
                                                             </Descriptions>
                                                             <Space.Compact direction='vertical'>
                                                                 <Button icon={<EditOutlined />} onClick={() => openEditProcess(procData, i)} />
-                                                                <Button icon={<DeleteOutlined />} onClick={() => restoreBatchState(wizardContext.batchData, procData.batchProcessId ? R.move(i, wizardContext.processList.length, { ...procData, __deleted: true }, wizardContext.processList) : R.remove(i, 1, wizardContext.processList))} />
+                                                                <Button icon={<DeleteOutlined />} onClick={() => restoreBatchState(wizardContext.batchData, procData.batchProcessId ? R.move(i, wizardContext.processList.length - 1, R.update(i, { ...procData, __deleted: true }, wizardContext.processList)) : R.remove(i, 1, wizardContext.processList))} />
                                                             </Space.Compact>
                                                         </Space.Compact>
                                                         <br />
