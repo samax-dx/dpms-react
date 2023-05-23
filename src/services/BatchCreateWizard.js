@@ -81,7 +81,7 @@ export const useBatchCreateWizardActions = () => {
     } = useBatchCreateWizardConditions();
 
     return {
-        openEditBatch: batchData => {console.log(planState, batchData);
+        openEditBatch: batchData => {
             canOpenEditBatch() && setPlanState(updateState(planState, { idle: false, editBatch: true, doneEditBatch: false }, { batchData }));
         },
         updateEditBatch: batchData => {

@@ -131,6 +131,87 @@ const ProcessForm = ({ processData, onFinish, onCancel, className }) => {
     );
 };
 
+const BatchForm = ({ batchData, onFinish, onCancel, className }) => {
+    return (
+        <Form
+            initialValues={batchData.batchId ? batchData : { ...batchData, batchId: Date.now() }}
+            onFinish={onFinish}
+            className={className}
+            layout='vertical'
+            size='small'
+        >
+            <Descriptions size='small'>
+                <Descriptions.Item>
+                    <Form.Item rules={[{ required: true }]} name={"batchId"} label="Batch No" children={<Input readOnly />} />
+                </Descriptions.Item>
+                <Descriptions.Item>
+                    <Form.Item rules={[{ required: true }]} name={"buyerName"} label="Buyer Name" children={<Input />} />
+                </Descriptions.Item>
+                <Descriptions.Item>
+                    <Form.Item rules={[{ required: true }]} name={"fabricsQuantity"} label="FAB. Qty (kg)" children={<Input />} />
+                </Descriptions.Item>
+                <Descriptions.Item>
+                    <Form.Item rules={[{ required: true }]} name={"fabricType"} label="FAB. Type" children={<Input />} />
+                </Descriptions.Item>
+                <Descriptions.Item>
+                    <Form.Item rules={[{ required: true }]} name={"requiredGsm"} label="Req. GSM" children={<Input />} />
+                </Descriptions.Item>
+                <Descriptions.Item>
+                    <Form.Item rules={[{ required: true }]} name={"pantone"} label="Color/Pantone" children={<Input />} />
+                </Descriptions.Item>
+                <Descriptions.Item>
+                    <Form.Item rules={[{ required: true }]} name={"liquorRatio"} label="Liquor Ratio" children={<Input />} />
+                </Descriptions.Item>
+                <Descriptions.Item>
+                    <Form.Item rules={[{ required: true }]} name={"orderId"} label="Order No" children={<Input />} />
+                </Descriptions.Item>
+                <Descriptions.Item>
+                    <Form.Item rules={[{ required: true }]} name={"styleId"} label="Style No" children={<Input />} />
+                </Descriptions.Item>
+                <Descriptions.Item>
+                    <Form.Item rules={[{ required: true }]} name={"labId"} label="Lab No" children={<Input />} />
+                </Descriptions.Item>
+                <Descriptions.Item>
+                    <Form.Item rules={[{ required: true }]} name={"totalRoll"} label="Total Roll" children={<Input />} />
+                </Descriptions.Item>
+                <Descriptions.Item>
+                    <Form.Item rules={[{ required: true }]} name={"challanNumber"} label="Challan No" children={<Input />} />
+                </Descriptions.Item>
+                <Descriptions.Item>
+                    <Form.Item rules={[{ required: true }]} name={"bycybl"} label={<Typography.Text style={{ fontSize: 12 }}>Body Yarn Count Yarn Brand & Lot</Typography.Text>} children={<Input />} />
+                </Descriptions.Item>
+                <Descriptions.Item>
+                    <Form.Item rules={[{ required: true }]} name={"bodySLength"} label="Body S. Length" children={<Input />} />
+                </Descriptions.Item>
+                <Descriptions.Item>
+                    <Form.Item rules={[{ required: true }]} name={"rycybl"} label={<Typography.Text style={{ fontSize: 12 }}>Rib Yarn Count Yarn Brand & Lot</Typography.Text>} children={<Input />} />
+                </Descriptions.Item>
+                <Descriptions.Item>
+                    <Form.Item rules={[{ required: true }]} name={"ribSLength"} label="Rib S. Length" children={<Input />} />
+                </Descriptions.Item>
+                <Descriptions.Item>
+                    <Form.Item label={'----------------'}>
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            size='small'
+                            children={"Confirm Save"}
+                        />
+                    </Form.Item>
+                    <Form.Item label={'---------'}>
+                        <Button
+                            type="primary"
+                            size='small'
+                            onClick={onCancel}
+                            children={"Cancel"}
+                        />
+                    </Form.Item>
+                </Descriptions.Item>
+            </Descriptions>
+        </Form>
+    );
+};
+
 export const BatchEditForm = () => {
     const [saveState, saveBatch] = useSaveBatch();
 
@@ -239,82 +320,12 @@ export const BatchEditForm = () => {
                 </Col>
                 {isEditingBatch() ? <Col md={12} sm={24}>
                     <Card cover={<Typography.Text style={{ paddingTop: 10, textAlign: "center" }} strong underline>Batch Data</Typography.Text>}>
-                        <Form
-                            initialValues={wizardContext.batchData.batchId ? wizardContext.batchData : { ...wizardContext.batchData, batchId: Date.now() }}
+                        <BatchForm
+                            batchData={wizardContext.batchData}
                             onFinish={finishEditBatch}
+                            onCancel={() => restoreBatchState(wizardContext.batchData, wizardContext.processList)}
                             className={mcss.batchForm}
-                            layout='vertical'
-                            size='small'
-                        >
-                            <Descriptions size='small'>
-                                <Descriptions.Item>
-                                    <Form.Item rules={[{ required: true }]} name={"batchId"} label="Batch No" children={<Input readOnly />} />
-                                </Descriptions.Item>
-                                <Descriptions.Item>
-                                    <Form.Item rules={[{ required: true }]} name={"buyerName"} label="Buyer Name" children={<Input />} />
-                                </Descriptions.Item>
-                                <Descriptions.Item>
-                                    <Form.Item rules={[{ required: true }]} name={"fabricsQuantity"} label="FAB. Qty (kg)" children={<Input />} />
-                                </Descriptions.Item>
-                                <Descriptions.Item>
-                                    <Form.Item rules={[{ required: true }]} name={"fabricType"} label="FAB. Type" children={<Input />} />
-                                </Descriptions.Item>
-                                <Descriptions.Item>
-                                    <Form.Item rules={[{ required: true }]} name={"requiredGsm"} label="Req. GSM" children={<Input />} />
-                                </Descriptions.Item>
-                                <Descriptions.Item>
-                                    <Form.Item rules={[{ required: true }]} name={"pantone"} label="Color/Pantone" children={<Input />} />
-                                </Descriptions.Item>
-                                <Descriptions.Item>
-                                    <Form.Item rules={[{ required: true }]} name={"liquorRatio"} label="Liquor Ratio" children={<Input />} />
-                                </Descriptions.Item>
-                                <Descriptions.Item>
-                                    <Form.Item rules={[{ required: true }]} name={"orderId"} label="Order No" children={<Input />} />
-                                </Descriptions.Item>
-                                <Descriptions.Item>
-                                    <Form.Item rules={[{ required: true }]} name={"styleId"} label="Style No" children={<Input />} />
-                                </Descriptions.Item>
-                                <Descriptions.Item>
-                                    <Form.Item rules={[{ required: true }]} name={"labId"} label="Lab No" children={<Input />} />
-                                </Descriptions.Item>
-                                <Descriptions.Item>
-                                    <Form.Item rules={[{ required: true }]} name={"totalRoll"} label="Total Roll" children={<Input />} />
-                                </Descriptions.Item>
-                                <Descriptions.Item>
-                                    <Form.Item rules={[{ required: true }]} name={"challanNumber"} label="Challan No" children={<Input />} />
-                                </Descriptions.Item>
-                                <Descriptions.Item>
-                                    <Form.Item rules={[{ required: true }]} name={"bycybl"} label={<Typography.Text style={{ fontSize: 12 }}>Body Yarn Count Yarn Brand & Lot</Typography.Text>} children={<Input />} />
-                                </Descriptions.Item>
-                                <Descriptions.Item>
-                                    <Form.Item rules={[{ required: true }]} name={"bodySLength"} label="Body S. Length" children={<Input />} />
-                                </Descriptions.Item>
-                                <Descriptions.Item>
-                                    <Form.Item rules={[{ required: true }]} name={"rycybl"} label={<Typography.Text style={{ fontSize: 12 }}>Rib Yarn Count Yarn Brand & Lot</Typography.Text>} children={<Input />} />
-                                </Descriptions.Item>
-                                <Descriptions.Item>
-                                    <Form.Item rules={[{ required: true }]} name={"ribSLength"} label="Rib S. Length" children={<Input />} />
-                                </Descriptions.Item>
-                                <Descriptions.Item>
-                                    <Form.Item label={'----------------'}>
-                                        <Button
-                                            type="primary"
-                                            htmlType="submit"
-                                            size='small'
-                                            children={"Confirm Save"}
-                                        />
-                                    </Form.Item>
-                                    <Form.Item label={'---------'}>
-                                        <Button
-                                            type="primary"
-                                            size='small'
-                                            onClick={() => restoreBatchState(wizardContext.batchData, wizardContext.processList)}
-                                            children={"Cancel"}
-                                        />
-                                    </Form.Item>
-                                </Descriptions.Item>
-                            </Descriptions>
-                        </Form>
+                        />
                     </Card>
                 </Col> : null}
                 {isEditingProcess() ? <Col md={12} sm={24}>
@@ -340,12 +351,14 @@ export const BatchEditForm = () => {
                             onCancel={() => restoreBatchState(wizardContext.batchData, wizardContext.processList.filter(p => !!p.processId))}
                         />
                         <br />
-                        {wizardContext.editIndex >= 0 && wizardContext.processList[wizardContext.editIndex].processId ? <ProcessForm
-                            processData={{ ...wizardContext.processList[wizardContext.editIndex] }}
-                            onFinish={procData => finishEditProcess({ ...procData, __new: undefined })}
-                            onCancel={() => restoreBatchState(wizardContext.batchData, wizardContext.processList)}
-                            className={mcss.processForm}
-                        /> : null}
+                        {wizardContext.editIndex >= 0 && wizardContext.processList[wizardContext.editIndex].processId ? <>
+                            <ProcessForm
+                                processData={{ ...wizardContext.processList[wizardContext.editIndex] }}
+                                onFinish={procData => finishEditProcess({ ...procData, __new: undefined })}
+                                onCancel={() => restoreBatchState(wizardContext.batchData, wizardContext.processList)}
+                                className={mcss.processForm}
+                            />
+                        </> : null}
                     </Card>
                 </Col> : null}
                 <Col span={24}>
