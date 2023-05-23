@@ -26,20 +26,22 @@ const processParamLabels = {
     "width_before": "Width Before",
     "width_after": "Width After",
     "over_feed": "Over Feed",
-    "pin_width": "Spreader/Pin Width"
+    "pin_width": "Spreader/Pin Width",
+    "padder_pressure": "Padder Pressure",
+    "machine_speed": "Machine Speed"
 };
 
 const processFormFields = {
     "squeezer": <>
         <Form.Item
-            name={"width_before"}
-            label={processParamLabels.width_before}
+            name={"machine_speed"}
+            label={processParamLabels.machine_speed}
             children={<Input />}
             rules={[{ required: true }]}
         />
         <Form.Item
-            name={"width_after"}
-            label={processParamLabels.width_after}
+            name={"padder_pressure"}
+            label={processParamLabels.padder_pressure}
             children={<Input />}
             rules={[{ required: true }]}
         />
@@ -63,8 +65,30 @@ const processFormFields = {
             children={<Input />}
             rules={[{ required: true }]}
         />
+        <Form.Item
+            name={"padder_pressure"}
+            label={processParamLabels.padder_pressure}
+            children={<Input />}
+            rules={[{ required: true }]}
+        />
     </>,
     "slitting": <>
+        <Form.Item
+            name={"padder_pressure"}
+            label={processParamLabels.padder_pressure}
+            children={<Input />}
+            rules={[{ required: true }]}
+        />
+    </>,
+    "stentering": <>
+        <Form.Item
+            name={"padder_pressure"}
+            label={processParamLabels.padder_pressure}
+            children={<Input />}
+            rules={[{ required: true }]}
+        />
+    </>,
+    "compacting": <>
         <Form.Item
             name={"width_before"}
             label={processParamLabels.width_before}
@@ -78,15 +102,20 @@ const processFormFields = {
             rules={[{ required: true }]}
         />
         <Form.Item
-            name={"pin_width"}
-            label={processParamLabels.pin_width}
+            name={"padder_pressure"}
+            label={processParamLabels.padder_pressure}
             children={<Input />}
             rules={[{ required: true }]}
         />
     </>,
-    "stentering": null,
-    "compacting": null,
-    "brushing": null
+    "brushing": <>
+        <Form.Item
+            name={"padder_pressure"}
+            label={processParamLabels.padder_pressure}
+            children={<Input />}
+            rules={[{ required: true }]}
+        />
+    </>
 };
 
 const ProcessForm = ({ processData, onFinish, onCancel, className }) => {
