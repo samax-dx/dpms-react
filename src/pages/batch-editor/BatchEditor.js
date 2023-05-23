@@ -12,14 +12,16 @@ import { useBatchCreateWizardActions } from '../../services/BatchCreateWizard';
 
 
 export const BatchEditor = () => {
-    const [editItem, setEditItem] = useState({ batchProcesses: [] });
     const { restoreBatchState, resetBatchState } = useBatchCreateWizardActions();
+    const [editItem, setEditItem] = useState({ batchProcesses: [] });
 
-    const openEditor = item => setEditItem(item);
-    const closeEditor = () => setEditItem({ batchProcesses: [] });
+    const openEditor = item => setEditItem(item) || restoreBatchState(item, item.batchProcesses);
+    const closeEditor = () => setEditItem({ batchProcesses: [] }) || resetBatchState();
 
-    useEffect(() => restoreBatchState(editItem, editItem.batchProcesses), [editItem]);
-    useEffect(() => resetBatchState, []);
+    useEffect(() => {
+        resetBatchState();
+        return resetBatchState;
+    }, []);
 
     return (
         <Layout>
@@ -38,7 +40,7 @@ export const BatchEditor = () => {
                             render={item => {
                                 return (
                                     <Button
-                                        onClick={_ => console.log(item) || openEditor(item)}
+                                        onClick={_ => openEditor(item)}
                                         style={{ height: "100%" }}
                                         children="Edit"
                                     />

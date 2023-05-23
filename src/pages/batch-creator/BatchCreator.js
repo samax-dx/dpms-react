@@ -21,11 +21,14 @@ export const BatchCreator = () => {
         if (!saveState.complete || saveState.data instanceof Error) {
             return;
         }
-        finishEdit();
         setCreatedItems([...createdItems, saveState.data]);
+        finishEdit();
     }, [saveState]);
 
-    useEffect(() => resetBatchState, []);
+    useEffect(() => {
+        resetBatchState();
+        return resetBatchState;
+    }, []);
 
     return (
         <Layout>

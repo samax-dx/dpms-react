@@ -7,7 +7,7 @@ import { Button, Card, Col, Descriptions, Form, Input, Row, Space, Spin, Typogra
 import { PicCenterOutlined, PicLeftOutlined, PicRightOutlined, BlockOutlined, BuildOutlined, CompressOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { useSaveBatch } from '../../services/BatchRepository';
-import { useBatchCreateWizardActions, useBatchCreateWizardConditions, useBatchCreateWizardState } from '../../services/BatchCreateWizard';
+import { useBatchCreateWizardActions, useBatchCreateWizardConditions, useBatchCreateWizardContext } from '../../services/BatchCreateWizard';
 import { TileNav } from '../navs/TileNav';
 import { dndDragEndDetailState } from '../../services/BeautifulDnD';
 
@@ -138,16 +138,16 @@ export const BatchEditForm = () => {
     const [batchForm] = Form.useForm();
     const [saveState, saveBatch] = useSaveBatch();
 
-    const { value: wizardState, context: wizardContext } = useBatchCreateWizardState();
+    const wizardContext = useBatchCreateWizardContext();
 
     const {
-        canOpenEditBatch, canFinishEditBatch, hasFinishedEditBatch,
-        canOpenEditProcess, canFinishEditProcess, hasFinishedEditProcess,
+        canOpenEditBatch, isEditingBatch, canFinishEditBatch, hasFinishedEditBatch,
+        canOpenEditProcess, isEditingProcess, canFinishEditProcess, hasFinishedEditProcess,
         canFinishEdit } = useBatchCreateWizardConditions();
 
     const {
-        openEditBatch, finishEditBatch,
-        openEditProcess, finishEditProcess,
+        openEditBatch, syncEditBatch, finishEditBatch,
+        openEditProcess, syncEditProcess, finishEditProcess,
         restoreBatchState
     } = useBatchCreateWizardActions();
 
@@ -233,7 +233,7 @@ export const BatchEditForm = () => {
                             )}
                         </Droppable> : null}
                         <Space className="justify-center">
-                            <Button type='primary' disabled={!!wizardContext.batchData.batchId} onClick={() => openEditBatch({ processList: [] })}>Add Batch Data</Button>
+                            <Button type='primary' disabled={!canOpenEditBatch() || !!wizardContext.batchData.batchId} onClick={() => openEditBatch({ processList: [] })}>Add Batch Data</Button>
                             <Button type='primary' disabled={!canOpenEditProcess()} onClick={() => openEditProcess({ __new: true }, wizardContext.processList.length)}>Add Process</Button>
                             <Button type='primary' disabled={!canFinishEdit()} onClick={() => saveBatch({ ...wizardContext.batchData, batchProcesses: wizardContext.processList })}>
                                 {!!wizardContext.batchData.createdOn ? "Update & Save Batch" : "Save & Create Batch"}
@@ -241,7 +241,7 @@ export const BatchEditForm = () => {
                         </Space>
                     </Card>
                 </Col>
-                {wizardState.editBatch ? <Col md={12} sm={24}>
+                {isEditingBatch() ? <Col md={12} sm={24}>
                     <Card cover={<Typography.Text style={{ paddingTop: 10, textAlign: "center" }} strong underline>Batch Data</Typography.Text>}>
                         <Form
                             form={batchForm}
@@ -322,7 +322,7 @@ export const BatchEditForm = () => {
                         </Form>
                     </Card>
                 </Col> : null}
-                {wizardState.editProcess ? <Col md={12} sm={24}>
+                {isEditingProcess() ? <Col md={12} sm={24}>
                     <Card
                         cover={<Typography.Text
                             style={{ paddingTop: 10, textAlign: "center" }}
@@ -331,7 +331,7 @@ export const BatchEditForm = () => {
                             children="Process Data" />}
                     >
                         <TileNav
-                            onChange={processId => openEditProcess({ ...wizardContext.processList[wizardContext.editIndex], processId }, wizardContext.editIndex)}
+                            onChange={processId => R.pipe(({ processList: pl, editIndex: i }) => syncEditProcess({ ...pl[i], processId }, i))({ ...wizardContext })}
                             items={[
                                 { icon: <PicCenterOutlined />, text: "Squeezer", data: "squeezer" },
                                 { icon: <PicLeftOutlined />, text: "Drying", data: "drying" },
@@ -342,7 +342,7 @@ export const BatchEditForm = () => {
                             ]}
                             selectedItem={wizardContext.processList[wizardContext.editIndex].processId}
                             editable={wizardContext.processList[wizardContext.editIndex].__new}
-                            onCancel={() => restoreBatchState(wizardContext.batchData, wizardContext.processList)}
+                            onCancel={() => restoreBatchState(wizardContext.batchData, wizardContext.processList.filter(p => !!p.processId))}
                         />
                         <br />
                         {wizardContext.editIndex >= 0 && wizardContext.processList[wizardContext.editIndex].processId ? <ProcessForm

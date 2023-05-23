@@ -47,7 +47,6 @@ const batchListStateX = atom({
             }
 
             const queryResponse = await fetcher(filter);
-            console.log(queryResponse);
             return queryResponse;
         }
     })

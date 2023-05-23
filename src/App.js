@@ -1,7 +1,7 @@
 import 'antd/dist/reset.css';
 import './App.css';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import { Home } from './pages/home/Home';
@@ -16,14 +16,15 @@ import { BatchEditor } from './pages/batch-editor/BatchEditor';
 import { BatchViewer } from './pages/batch-viewer/BatchViewer';
 import { ConfigProvider } from 'antd';
 import { DragDropContext } from 'react-beautiful-dnd';
-import { useSetRecoilState } from 'recoil';
+import { useRecoilState } from 'recoil';
 import { dndDragEndDetailState } from './services/BeautifulDnD';
 
 
 const createPage = component => <div className="app">{component}</div>;
 
 const App = () => {
-    const setDragEndState = useSetRecoilState(dndDragEndDetailState);
+    const [dragEndState, setDragEndState] = useRecoilState(dndDragEndDetailState);
+    useEffect(() => void (dragEndState.result.destination && setDragEndState({ result: {}, provided: {} })), [dragEndState]);
 
     return (
         <ConfigProvider
