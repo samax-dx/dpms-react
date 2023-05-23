@@ -1,6 +1,6 @@
 import mcss from './BatchEditForm.module.css';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useRecoilValue } from 'recoil';
 import * as R from 'ramda';
 import { Button, Card, Col, Descriptions, Form, Input, Row, Space, Spin, Typography, notification } from "antd";
@@ -90,11 +90,8 @@ const processFormFields = {
 };
 
 const ProcessForm = ({ processData, onFinish, onCancel, className }) => {
-    const [processForm] = Form.useForm();
-
     return (
         <Form
-            form={processForm}
             initialValues={processData}
             onFinish={onFinish}
             className={className}
@@ -135,7 +132,6 @@ const ProcessForm = ({ processData, onFinish, onCancel, className }) => {
 };
 
 export const BatchEditForm = () => {
-    const [batchForm] = Form.useForm();
     const [saveState, saveBatch] = useSaveBatch();
 
     const wizardContext = useBatchCreateWizardContext();
@@ -244,7 +240,6 @@ export const BatchEditForm = () => {
                 {isEditingBatch() ? <Col md={12} sm={24}>
                     <Card cover={<Typography.Text style={{ paddingTop: 10, textAlign: "center" }} strong underline>Batch Data</Typography.Text>}>
                         <Form
-                            form={batchForm}
                             initialValues={wizardContext.batchData.batchId ? wizardContext.batchData : { ...wizardContext.batchData, batchId: Date.now() }}
                             onFinish={finishEditBatch}
                             className={mcss.batchForm}

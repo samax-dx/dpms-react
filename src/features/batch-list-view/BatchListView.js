@@ -11,9 +11,7 @@ export const BatchListView = ({ items: managedList, className, render: renderAct
     var [batchListLoadable, setBatchQueryFilter] = useBatchList();
     managedList && (batchListLoadable = { contents: managedList, state: "hasValue" });
 
-    useEffect(() => {
-        managedList || setBatchQueryFilter("");
-    }, []);
+    useEffect(() => void (managedList || setBatchQueryFilter("")), []);
 
     switch (batchListLoadable.state) {
         case "hasValue":
