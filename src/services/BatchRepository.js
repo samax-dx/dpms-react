@@ -3,7 +3,7 @@ import { atom, selector, useRecoilState, useRecoilValueLoadable, useSetRecoilSta
 import { createDataQueryHook } from "@Lib/RecoilUtil";
 
 
-const base_url = "http://localhost:18082/Batch";
+const base_url = `http://${window.location.hostname}:18082/Batch`;
 
 const batchListState = atom({
     key: "batchListState",

@@ -4,16 +4,16 @@ import './App.css';
 import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-import { Home } from './pages/home/Home';
-import { Dyeing } from './pages/dyeing/Dyeing';
-import { Slitting } from './pages/slitting/Slitting';
-import { Stenter } from './pages/stenter/Stenter';
-import { Compector } from './pages/compector/Compector';
-import { Delivery } from './pages/delivery/Delivery';
-import { PlanningHome } from './pages/planning-home/PlanningHome';
-import { BatchCreator } from './pages/batch-creator/BatchCreator';
-import { BatchEditor } from './pages/batch-editor/BatchEditor';
-import { BatchViewer } from './pages/batch-viewer/BatchViewer';
+import { HomePage } from './components/HomePage/HomePage';
+import { DyeingPage } from './components/DyeingPage/DyeingPage';
+import { SlittingPage } from './components/SlittingPage/SlittingPage';
+import { StenterPage } from './components/StenterPage/StenterPage';
+import { CompectorPage } from './components/CompectorPage/CompectorPage';
+import { DeliveryPage } from './components/DeliveryPage/DeliveryPage';
+import { PlanningHomePage } from './components/PlanningHomePage/PlanningHomePage';
+import { BatchCreatorPage } from './components/BatchCreatorPage/BatchCreatorPage';
+import { BatchEditorPage } from './components/BatchEditorPage/BatchEditorPage';
+import { BatchViewer } from './components/BatchViewerPage/BatchViewerPage';
 import { ConfigProvider } from 'antd';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { useRecoilState } from 'recoil';
@@ -42,15 +42,15 @@ const App = () => {
             <DragDropContext onDragEnd={(result, provided) => setDragEndState({ result, provided })}>
                 <BrowserRouter>
                     <Routes>
-                        <Route path='/' element={createPage(<Home />)} />
-                        <Route path='/dyeing' element={createPage(<Dyeing />)} />
-                        <Route path='/slitting' element={createPage(<Slitting />)} />
-                        <Route path='/stenter' element={createPage(<Stenter />)} />
-                        <Route path='/compector' element={createPage(<Compector />)} />
-                        <Route path='/delivery' element={createPage(<Delivery />)} />
-                        <Route path='/planning' element={createPage(<PlanningHome />)} />
-                        <Route path='/planning/create-batch' element={createPage(<BatchCreator />)} />
-                        <Route path='/planning/edit-batch' element={createPage(<BatchEditor />)} />
+                        <Route path='/' element={createPage(<HomePage />)} />
+                        <Route path='/dyeing' element={createPage(<DyeingPage />)} />
+                        <Route path='/slitting' element={createPage(<SlittingPage />)} />
+                        <Route path='/stenter' element={createPage(<StenterPage />)} />
+                        <Route path='/compector' element={createPage(<CompectorPage />)} />
+                        <Route path='/delivery' element={createPage(<DeliveryPage />)} />
+                        <Route path='/planning' element={createPage(<PlanningHomePage />)} />
+                        <Route path='/planning/create-batch' element={createPage(<BatchCreatorPage />)} />
+                        <Route path='/planning/edit-batch' element={createPage(<BatchEditorPage />)} />
                         <Route path='/planning/view-batch' element={createPage(<BatchViewer />)} />
                     </Routes>
                 </BrowserRouter>

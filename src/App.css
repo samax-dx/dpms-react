@@ -2,13 +2,13 @@
   max-width: 100vw;
 }
 
-.ant-card {
-  overflow: hidden;
-}
-
 .ant-space.justify-center {
   width: 100%;
   justify-content: center;
+}
+
+.ant-card {
+  overflow: hidden;
 }
 
 .ant-card.cr-active {
