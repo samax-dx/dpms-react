@@ -14,6 +14,7 @@ import { PlanningHomePage } from './components/PlanningHomePage/PlanningHomePage
 import { BatchCreatorPage } from './components/BatchCreatorPage/BatchCreatorPage';
 import { BatchEditorPage } from './components/BatchEditorPage/BatchEditorPage';
 import { BatchViewer } from './components/BatchViewerPage/BatchViewerPage';
+import { PublishedBatchManagerPage } from './components/PublishedBatchManagerPage/PublishedBatchManagerPage';
 import { ConfigProvider } from 'antd';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { useRecoilState } from 'recoil';
@@ -52,6 +53,7 @@ const App = () => {
                         <Route path='/planning/create-batch' element={createPage(<BatchCreatorPage />)} />
                         <Route path='/planning/edit-batch' element={createPage(<BatchEditorPage />)} />
                         <Route path='/planning/view-batch' element={createPage(<BatchViewer />)} />
+                        <Route path='/published-batches' element={createPage(<PublishedBatchManagerPage />)} />
                     </Routes>
                 </BrowserRouter>
             </DragDropContext>

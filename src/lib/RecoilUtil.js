@@ -35,11 +35,11 @@ export const createDataQueryHook = (hookName, fetcher, respSyncState) => {
 };
 };
 
-export const useCreateBatch = () => {
+export const useSaveBatch = () => {
     const [batchList, setBatchList] = useRecoilState(batchListState);
 
     return async (batchData) => {
-        const response = await axios.post(`${base_url}/createBatch`, batchData);
+        const response = await axios.post(`${base_url}/saveBatch`, batchData);
         setBatchList([...batchList, response.data]);
     };
 };
@@ -48,7 +48,7 @@ export const useUpdateBatch = () => {
     const [batchList, setBatchList] = useRecoilState(batchListState);
 
     return async (batchData) => {
-        const response = await axios.post(`${base_url}/createBatch`, batchData);
+        const response = await axios.post(`${base_url}/saveBatch`, batchData);
         setBatchList(batchList.map(batch => batch.batchId === batchData.batchId ? response.data : batch));
     };
 };
@@ -57,7 +57,7 @@ export const useDeleteBatch = () => {
     const [batchList, setBatchList] = useRecoilState(batchListState);
 
     return async (batchId) => {
-        const response = await axios.post(`${base_url}/createBatch`, batchId);
+        const response = await axios.post(`${base_url}/saveBatch`, batchId);
         response.data.includes(batchId) && setBatchList(batchList => batchList.filter(batch => batch.batchId !== batchId));
     };
 };

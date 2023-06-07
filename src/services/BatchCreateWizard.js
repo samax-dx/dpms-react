@@ -96,6 +96,12 @@ export const useBatchCreateWizardActions = () => {
 
             canOpenEditProcess() && setPlanState(updateState(planState, { idle: false, editProcess: true, doneEditProcess: false }, { processList, editIndex }));
         },
+        insertAndEditProcess: (processData, editIndex) => {
+            const processList = [...planState.context.processList];
+            processList.splice(editIndex, 0, { ...processData });
+
+            canOpenEditProcess() && setPlanState(updateState(planState, { idle: false, editProcess: true, doneEditProcess: false }, { processList, editIndex }));
+        },
         syncEditProcess: (processData, editIndex) => {
             const processList = [...planState.context.processList];
             processList[editIndex] = { ...processData };

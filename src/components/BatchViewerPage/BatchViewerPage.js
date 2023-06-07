@@ -21,7 +21,7 @@ export const BatchViewer = () => {
             </Layout.Header>
             <Layout.Content className={mcss.content}>
                 <Card style={{ backgroundColor: "transparent" }}>
-                    <Card title="Running Batches" size='small'>
+                    <Card title="Planned Batches" size='small'>
                         <BatchListView />
                     </Card>
                 </Card>

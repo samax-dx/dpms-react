@@ -28,10 +28,14 @@ export const MainNav = () => {
                     key: "edit-batch",
                 },
                 {
-                    label: <Link to={"/planning/view-batch"}>View Runnign Batch</Link>,
+                    label: <Link to={"/planning/view-batch"}>View Planned Batches</Link>,
                     key: 'view-batch',
                 }
             ]
+        },
+        {
+            label: <Link to={"/published-batches"}>Published Batches</Link>,
+            key: "published-batches"
         }
     ];
 

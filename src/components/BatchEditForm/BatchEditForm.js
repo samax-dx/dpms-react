@@ -4,13 +4,14 @@ import mcss from './BatchEditForm.module.css';
 import React, { useEffect } from 'react';
 import { useRecoilValue } from 'recoil';
 import * as R from 'ramda';
-import { Button, Card, Col, Descriptions, Form, Input, Row, Space, Spin, Typography, notification } from "antd";
+import { Button, Card, Col, Descriptions, Form, Input, Row, Select, Space, Spin, Typography, notification } from "antd";
 import { PicCenterOutlined, PicLeftOutlined, PicRightOutlined, BlockOutlined, BuildOutlined, CompressOutlined, EditOutlined, DeleteOutlined, ProjectOutlined } from '@ant-design/icons';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { useSaveBatch } from '../../services/BatchRepository';
 import { useBatchCreateWizardActions, useBatchCreateWizardConditions, useBatchCreateWizardContext } from '../../services/BatchCreateWizard';
 import { TileNav } from '../navs/TileNav';
 import { dndDragEndDetailState } from '../../services/BeautifulDnD';
+import { useMachineList } from '../../services/MachineRepository';
 
 
 const processLabels = {
@@ -30,144 +31,132 @@ const processParamLabels = {
     "over_feed": "Over Feed",
     "pin_width": "Spreader/Pin Width",
     "padder_pressure": "Padder Pressure",
-    "machine_speed": "Machine Speed"
+    "machine_speed": "Machine Speed",
+    "machineId": "Machine No."
 };
 
-const processFormFields = {
-    "dyeing": <>
+const createProcessMachineField = (machines) => (
+    <Form.Item
+        name={"machineId"}
+        label={processParamLabels["machineId"]}
+        children={<Select options={machines.map(machine => ({ value: machine.machineId, label: machine.machineId }))}/>}
+        rules={[{ required: true }]}
+    />
+);
+
+const createProcessFormField = name => (
+    <>
         <Form.Item
-            name={"padder_pressure"}
-            label={processParamLabels.padder_pressure}
-            children={<Input />}
-            rules={[{ required: true }]}
-        />
-    </>,
-    "squeezer": <>
-        <Form.Item
-            name={"machine_speed"}
-            label={processParamLabels.machine_speed}
-            children={<Input />}
-            rules={[{ required: true }]}
-        />
-        <Form.Item
-            name={"padder_pressure"}
-            label={processParamLabels.padder_pressure}
-            children={<Input />}
-            rules={[{ required: true }]}
-        />
-    </>,
-    "drying": <>
-        <Form.Item
-            name={"width_before"}
-            label={processParamLabels.width_before}
+            name={name}
+            label={processParamLabels[name]}
             children={<Input />}
             rules={[{ required: true }]}
         />
         <Form.Item
-            name={"width_after"}
-            label={processParamLabels.width_after}
+            name={name + "__rid"}
             children={<Input />}
-            rules={[{ required: true }]}
+            rules={[{ required: false }]}
+            hidden
         />
         <Form.Item
-            name={"over_feed"}
-            label={processParamLabels.over_feed}
+            name={name + "__tid"}
             children={<Input />}
-            rules={[{ required: true }]}
-        />
-        <Form.Item
-            name={"padder_pressure"}
-            label={processParamLabels.padder_pressure}
-            children={<Input />}
-            rules={[{ required: true }]}
-        />
-    </>,
-    "slitting": <>
-        <Form.Item
-            name={"padder_pressure"}
-            label={processParamLabels.padder_pressure}
-            children={<Input />}
-            rules={[{ required: true }]}
-        />
-    </>,
-    "stentering": <>
-        <Form.Item
-            name={"padder_pressure"}
-            label={processParamLabels.padder_pressure}
-            children={<Input />}
-            rules={[{ required: true }]}
-        />
-    </>,
-    "compacting": <>
-        <Form.Item
-            name={"width_before"}
-            label={processParamLabels.width_before}
-            children={<Input />}
-            rules={[{ required: true }]}
-        />
-        <Form.Item
-            name={"width_after"}
-            label={processParamLabels.width_after}
-            children={<Input />}
-            rules={[{ required: true }]}
-        />
-        <Form.Item
-            name={"padder_pressure"}
-            label={processParamLabels.padder_pressure}
-            children={<Input />}
-            rules={[{ required: true }]}
-        />
-    </>,
-    "brushing": <>
-        <Form.Item
-            name={"padder_pressure"}
-            label={processParamLabels.padder_pressure}
-            children={<Input />}
-            rules={[{ required: true }]}
+            rules={[{ required: false }]}
+            hidden
         />
     </>
-};
+);
+
+const processFormFields = (machines) => ({
+    "dyeing": <>
+        {createProcessMachineField(machines.filter(machine => machine.workloadType === "dyeing"))}
+        {createProcessFormField("padder_pressure")}
+    </>,
+    "squeezer": <>
+        {createProcessMachineField(machines.filter(machine => machine.workloadType === "squeezer"))}
+        {createProcessFormField("machine_speed")}
+        {createProcessFormField("padder_pressure")}
+    </>,
+    "drying": <>
+        {createProcessMachineField(machines.filter(machine => machine.workloadType === "drying"))}
+        {createProcessFormField("width_before")}
+        {createProcessFormField("width_after")}
+        {createProcessFormField("over_feed")}
+        {createProcessFormField("padder_pressure")}
+    </>,
+    "slitting": <>
+        {createProcessMachineField(machines.filter(machine => machine.workloadType === "slitting"))}
+        {createProcessFormField("padder_pressure")}
+    </>,
+    "stentering": <>
+        {createProcessMachineField(machines.filter(machine => machine.workloadType === "stentering"))}
+        {createProcessFormField("padder_pressure")}
+    </>,
+    "compacting": <>
+        {createProcessMachineField(machines.filter(machine => machine.workloadType === "compacting"))}
+        {createProcessFormField("width_before")}
+        {createProcessFormField("width_after")}
+        {createProcessFormField("padder_pressure")}
+    </>,
+    "brushing": <>
+        {createProcessMachineField(machines.filter(machine => machine.workloadType === "brushing"))}
+        {createProcessFormField("padder_pressure")}
+    </>
+});
 
 const ProcessForm = ({ processData, onFinish, onCancel, className }) => {
-    return (
-        <Form
-            initialValues={processData}
-            onFinish={onFinish}
-            className={className}
-            layout='vertical'
-            size='small'
-        >
-            <Space>
-                <Form.Item
-                    name={"batchProcessId"}
-                    hidden
-                    children={<Input />}
-                />
-                <Form.Item
-                    name={"processId"}
-                    hidden
-                    children={<Input />}
-                />
-                {processFormFields[processData.processId]}
-                <Form.Item label={'----------------'}>
-                    <Button
-                        type="primary"
-                        htmlType="submit"
-                        size='small'
-                        children={"Confirm Save"}
-                    />
-                </Form.Item>
-                <Form.Item label={'---------'}>
-                    <Button
-                        type="primary"
-                        size='small'
-                        onClick={onCancel}
-                        children={"Cancel"}
-                    />
-                </Form.Item>
-            </Space>
-        </Form>
-    );
+    const [loadableList, setListFilter] = useMachineList();
+
+    useEffect(() => setListFilter(""), []);
+
+    switch (loadableList.state) {
+        case "hasValue":
+            return (
+                <Form
+                    initialValues={processData}
+                    onFinish={onFinish}
+                    className={className}
+                    layout='vertical'
+                    size='small'
+                >
+                    <Space>
+                        <Form.Item
+                            name={"batchProcessId"}
+                            hidden
+                            children={<Input />}
+                        />
+                        <Form.Item
+                            name={"processId"}
+                            hidden
+                            children={<Input />}
+                        />
+                        {processFormFields(loadableList.contents)[processData.processId]}
+                        <Form.Item label={'----------------'}>
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                                size='small'
+                                children={"Confirm Save"}
+                            />
+                        </Form.Item>
+                        <Form.Item label={'---------'}>
+                            <Button
+                                type="primary"
+                                size='small'
+                                onClick={onCancel}
+                                children={"Cancel"}
+                            />
+                        </Form.Item>
+                    </Space>
+                </Form>
+            );
+        case "loading":
+            return <div>Loading...</div>;
+        case "hasError":
+            return <div>Error: {loadableList.contents.message}</div>;
+        default:
+            return <div>Unknow Result...</div>;
+    }
 };
 
 const BatchForm = ({ batchData, onFinish, onCancel, className }) => {
@@ -327,15 +316,15 @@ export const BatchEditForm = () => {
                                                 <div {...ddHelper.draggableProps} {...ddHelper.dragHandleProps} ref={ddHelper.innerRef}>
                                                     <div style={{ display: procData.__new || procData.__deleted ? "none" : undefined }}>
                                                         <Space.Compact block>
-                                                            <Descriptions layout="vertical" size="small" column={6} bordered style={{ flexGrow: 1 }}>
+                                                            <Descriptions layout="vertical" size="small" column={7} bordered style={{ flexGrow: 1 }}>
                                                                 <Descriptions.Item label={"#"} key={`pdi-i${i}`} style={{ width: 10 }}>{i + 1}</Descriptions.Item>
-                                                                {Object.entries(procData).filter(([k]) => !["batchProcessId", "processOrder", "__deleted", "__new"].includes(k)).slice(0, 5).map(([k, v], i) => (
-                                                                    <Descriptions.Item label={processParamLabels[k]} key={`pdp-i${i}`}>{processLabels[v] || v}</Descriptions.Item>
+                                                                {Object.entries(procData).filter(([k]) => !k.match(/__\w+$/) && !["batchProcessId", "processOrder", "batch", "batchId", "machine", "finished", "__deleted", "__new"].includes(k)).slice(0, 6).map(([k, v], i) => ( //{Object.entries(procData.parameterMap).slice(0, 5).map(([k, v], i) => (
+                                                                    <Descriptions.Item label={processParamLabels[k]} key={`pdp-i${i}`}>{v || ""}</Descriptions.Item>
                                                                 ))}
                                                             </Descriptions>
                                                             <Space.Compact direction='vertical'>
                                                                 <Button icon={<EditOutlined />} onClick={() => openEditProcess(procData, i)} />
-                                                                <Button icon={<DeleteOutlined />} onClick={() => restoreBatchState(wizardContext.batchData, procData.batchProcessId ? R.move(i, wizardContext.processList.length - 1, R.update(i, { ...procData, __deleted: true }, wizardContext.processList)) : R.remove(i, 1, wizardContext.processList))} />
+                                                                <Button icon={<DeleteOutlined />} onClick={() => restoreBatchState(wizardContext.batchData, /*procData.batchProcessId ? R.move(i, wizardContext.processList.length - 1, R.update(i, { ...procData, __deleted: true }, wizardContext.processList)) : */R.remove(i, 1, wizardContext.processList))} />
                                                             </Space.Compact>
                                                         </Space.Compact>
                                                         <br />
