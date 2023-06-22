@@ -25,9 +25,9 @@ export const BatchListViewItem = ({ batch }) => {
                     <Descriptions.Item label="Total Roll">{batch.totalRoll}</Descriptions.Item>
                     <Descriptions.Item label="Challan No">{batch.challanNumber}</Descriptions.Item>
                     <Descriptions.Item label="Body Yarn Count Yarn Brand & Lot">{batch.bycybl}</Descriptions.Item>
-                    <Descriptions.Item label="Body S. Length">{batch.bodySLength}</Descriptions.Item>
+                    <Descriptions.Item label="Body S. Length">{batch.bodySxLength}</Descriptions.Item>
                     <Descriptions.Item label="Rib Yarn Count Yarn Brand & Lot">{batch.rycybl}</Descriptions.Item>
-                    <Descriptions.Item label="Rib S. Length">{batch.ribSLength}</Descriptions.Item>
+                    <Descriptions.Item label="Rib S. Length">{batch.ribSxLength}</Descriptions.Item>
                     <Descriptions.Item label="Created On">{dayjs(batch.createdOn).format('DD/MM/YYYY - hh:mm A')}</Descriptions.Item>
                 </Descriptions>
             </SemiCollapse>

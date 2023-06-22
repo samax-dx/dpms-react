@@ -209,13 +209,13 @@ const BatchForm = ({ batchData, onFinish, onCancel, className }) => {
                     <Form.Item rules={[{ required: true }]} name={"bycybl"} label={<Typography.Text style={{ fontSize: 12 }}>Body Yarn Count Yarn Brand & Lot</Typography.Text>} children={<Input />} />
                 </Descriptions.Item>
                 <Descriptions.Item>
-                    <Form.Item rules={[{ required: true }]} name={"bodySLength"} label="Body S. Length" children={<Input />} />
+                    <Form.Item rules={[{ required: true }]} name={"bodySxLength"} label="Body S. Length" children={<Input />} />
                 </Descriptions.Item>
                 <Descriptions.Item>
                     <Form.Item rules={[{ required: true }]} name={"rycybl"} label={<Typography.Text style={{ fontSize: 12 }}>Rib Yarn Count Yarn Brand & Lot</Typography.Text>} children={<Input />} />
                 </Descriptions.Item>
                 <Descriptions.Item>
-                    <Form.Item rules={[{ required: true }]} name={"ribSLength"} label="Rib S. Length" children={<Input />} />
+                    <Form.Item rules={[{ required: true }]} name={"ribSxLength"} label="Rib S. Length" children={<Input />} />
                 </Descriptions.Item>
                 <Descriptions.Item>
                     <Form.Item label={'----------------'}>

@@ -1,12 +1,12 @@
 import mcss from './PublishedBatchManagerPage.module.css';
 
 import { useEffect } from 'react';
-import { Button, Card, Col, Descriptions, Layout, Row, Space } from 'antd';
 import dayjs from 'dayjs';
+import { Card, Col, Descriptions, Layout, Row, Space } from 'antd';
 import { BasicLogo } from '../logos/BasicLogo';
 import { HeaderButtonPv } from '../ProfileViewers/HeaderButtonPv';
 import { MainNav } from '../navs/MainNav';
-import { usePublishBatch, usePublishedBatchList } from '../../services/BatchRepository';
+import { usePublishedBatchList } from '../../services/BatchRepository';
 
 
 const createListView = batchListLoadable => {
@@ -15,11 +15,16 @@ const createListView = batchListLoadable => {
             return (
                 <Space direction="vertical" size={"large"} style={{ width: "100%", padding: "20px 10px" }}>
                     {batchListLoadable.contents.map((item, i) => (
-                        <Descriptions layout="vertical" style={{ flexGrow: 1 }} bordered key={`bi-i${i}`} size="small" column={7}>
+                        <Descriptions layout="vertical" style={{ flexGrow: 1 }} bordered key={`bi-i${i}`} size="small" column={8}>
                             <Descriptions.Item label="#">{i}</Descriptions.Item>
                             <Descriptions.Item label="Batch No.">{item.batchId}</Descriptions.Item>
                             <Descriptions.Item label="Publish Time">{dayjs(item.updatedOn).format('DD/MM/YYYY - hh:mm A')}</Descriptions.Item>
-                            <Descriptions.Item label="Machine No">{item.batchProcesses.find(process => !process.finished).machineId}</Descriptions.Item>
+                            <Descriptions.Item label="Process Name">
+                                {item.batchProcesses.find(process => !process.finished).processId}
+                            </Descriptions.Item>
+                            <Descriptions.Item label="Machine No">
+                                {item.batchProcesses.find(process => !process.finished).machine.machineId}
+                            </Descriptions.Item>
                             <Descriptions.Item label="Start Time">-</Descriptions.Item>
                             <Descriptions.Item label="End Time">-</Descriptions.Item>
                             <Descriptions.Item label="Duration">-</Descriptions.Item>
@@ -38,7 +43,6 @@ const createListView = batchListLoadable => {
 
 export const PublishedBatchManagerPage = () => {
     const [batchListLoadable, setBatchQueryFilter] = usePublishedBatchList();
-    const [publishState, publishBatch] = usePublishBatch();
 
     useEffect(() => void (setBatchQueryFilter("")), []);
 
