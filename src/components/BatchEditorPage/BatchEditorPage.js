@@ -61,7 +61,7 @@ export const BatchEditorPage = () => {
                 </Row>
             </Layout.Header>
             <Layout.Content className={mcss.content}>
-                <Card style={{ backgroundColor: "transparent" }}>
+                <Card bordered={false} style={{ backgroundColor: "transparent", boxShadow: "none" }}>
                     <Card title="Planned Batches" size='small'>
                         <Space direction={"vertical"}>
                             <BatchListView

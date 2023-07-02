@@ -12,28 +12,8 @@ import { useBatchCreateWizardActions, useBatchCreateWizardConditions, useBatchCr
 import { TileNav } from '../navs/TileNav';
 import { dndDragEndDetailState } from '../../services/BeautifulDnD';
 import { useMachineList } from '../../services/MachineRepository';
+import { processParamLabels } from '../../services/SystemData';
 
-
-const processLabels = {
-    "dyeing": "Dyeing",
-    "squeezer": "Squeezer",
-    "drying": "Drying",
-    "slitting": "Slitting",
-    "stentering": "Stentering",
-    "compacting": "Compacting",
-    "brushing": "Brushing"
-};
-
-const processParamLabels = {
-    "processId": "Process",
-    "width_before": "Width Before",
-    "width_after": "Width After",
-    "over_feed": "Over Feed",
-    "pin_width": "Spreader/Pin Width",
-    "padder_pressure": "Padder Pressure",
-    "machine_speed": "Machine Speed",
-    "machineId": "Machine No."
-};
 
 const createProcessMachineField = (machines) => (
     <Form.Item
@@ -114,7 +94,7 @@ const ProcessForm = ({ processData, onFinish, onCancel, className }) => {
             return (
                 <Form
                     initialValues={processData}
-                    onFinish={onFinish}
+                    onFinish={data => console.log(data) || onFinish(data)}
                     className={className}
                     layout='vertical'
                     size='small'

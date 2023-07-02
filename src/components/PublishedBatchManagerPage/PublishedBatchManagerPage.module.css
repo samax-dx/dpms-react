@@ -5,3 +5,123 @@
 .content {
     min-height: 100vh;
 }
+
+/*
+.statusBox {
+    box-shadow: 0 0 1px 0 blue inset;
+    padding: 2px;
+}
+
+.statusBox :global(.ant-descriptions-view) {
+    border-radius: 2px;
+}
+
+.statusBox :global(.ant-descriptions-item-label),
+.statusBox :global(.ant-descriptions-item-content) {
+    padding: 8px 4px !important;
+}
+
+.statusBox :global(.ant-descriptions-row:not(:nth-child(n + 3)) .ant-descriptions-item-label:first-child span),
+.statusBox :global(.ant-descriptions-row:not(:nth-child(n + 3)) .ant-descriptions-item-content:first-child span) {
+    margin-left: 10%;
+}
+
+.statusBox :global(.ant-card) {
+    margin-top: 6px;
+}
+
+.statusBox :global(.ant-card-body) {
+    padding: 0 4px;
+}
+
+.statusBox :global(.process-col.next .ant-card) {
+    box-shadow: 0 0 0px 1px red inset;
+}
+
+.statusBox :global(.process-col.next ~ .process-col.next .ant-card) {
+    box-shadow: none;
+}
+
+.statusBox :global(.process-card) {
+    border-radius: 0;
+}
+*/
+/* .statusBox {
+    box-shadow: 1px 1px 1px 1px gray;
+    padding: 5px 1px;
+} */
+
+.statusBox :global(.ant-space-item) {
+    flex-grow: 1;
+}
+
+.statusBox :global(>.ant-space>.ant-space-item:first-child) {
+    flex-grow: initial;
+}
+
+.statusBox :global(.batch-data .ant-descriptions-item-label) {
+    color: #168c81;
+    font-weight: bold;
+}
+
+.statusBox :global(> div > :first-child) {
+    flex: none;
+    min-width: 25%;
+    max-width: 45%;
+}
+
+.statusBox :global(> div > :last-child) {
+    flex: 1;
+}
+
+.statusBox :global(.batch-setting) {
+    width: 100%;
+    padding-left: 25px;
+    text-align: center;
+}
+
+.statusBox :global(.batch-setting) {
+    padding: 0 0 0 25px;
+    border: none;
+    height: 100%;
+    position: relative;
+}
+
+.statusBox :global(.batch-setting::before),
+.statusBox :global(.batch-setting::after) {
+    content: " ";
+    position: absolute;
+    left: calc(50% - 12px);
+    width: 50px;
+    border-top: 1px solid;
+}
+
+.statusBox :global(.batch-setting::before) {
+    top: 0;
+}
+
+.statusBox :global(.batch-setting::after) {
+    bottom: 0;
+}
+
+.statusBox :global(.ant-descriptions-item-label),
+.statusBox :global(.ant-descriptions-item-content) {
+    padding: 5px 10px !important;
+}
+
+.statusBox :global(.process-list) {
+    height: 100%;
+}
+
+.statusBox :global(.process-list>div) {
+    padding: 2%;
+}
+
+.statusBox :global(.process-data.is-next:not(.ant-col~.ant-col .process-data)) {
+    border-color: lightgreen;
+    background-color: lightcyan;
+}
+
+.statusBox :global(.process-data .ant-card-body) {
+    padding: 1em;
+}

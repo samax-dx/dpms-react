@@ -24,7 +24,7 @@ export const PlanningHomePage = () => {
             </Layout.Header>
             <Layout.Content className={mcss.content}>
                 <Spin spinning={spinning} size={"large"}>
-                    <Card style={{ backgroundColor: "transparent" }}>
+                    <Card bordered={false} style={{ backgroundColor: "transparent", boxShadow: "none" }}>
                         { }
                     </Card>
                 </Spin>

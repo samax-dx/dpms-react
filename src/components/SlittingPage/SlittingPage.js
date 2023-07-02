@@ -22,7 +22,7 @@ export const SlittingPage = () => (
             </Row>
         </Layout.Header>
         <Layout.Content className={mcss.content}>
-            <Card style={{ backgroundColor: "transparent" }}>
+            <Card bordered={false} style={{ backgroundColor: "transparent", boxShadow: "none" }}>
                 <SlittingQueue />
             </Card>
         </Layout.Content>

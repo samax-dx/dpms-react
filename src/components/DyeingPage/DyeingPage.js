@@ -25,7 +25,7 @@ export const DyeingPage = () => {
                 </Row>
             </Layout.Header>
             <Layout.Content className={mcss.content}>
-                <Card style={{ backgroundColor: "transparent" }}>
+                <Card bordered={false} style={{ backgroundColor: "transparent", boxShadow: "none" }}>
                     <Row gutter={[10, 10]} style={{ marginLeft: 0, marginRight: 0 }}>
                         <Col span={24}>
                             <DyeingTask task={task} onUnload={() => setTask(null)} />

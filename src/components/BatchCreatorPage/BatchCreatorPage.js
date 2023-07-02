@@ -42,7 +42,7 @@ export const BatchCreatorPage = () => {
                 </Row>
             </Layout.Header>
             <Layout.Content className={mcss.content}>
-                <Card style={{ backgroundColor: "transparent" }}>
+                <Card bordered={false} style={{ backgroundColor: "transparent", boxShadow: "none" }}>
                     <Card bordered={false} size='small' cover={<Typography.Text type="secondary" underline style={{ padding: "5px 15px" }} strong>Batch Create Panel</Typography.Text>}>
                         <BatchEditForm />
                     </Card>
