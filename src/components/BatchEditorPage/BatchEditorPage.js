@@ -14,8 +14,8 @@ import { usePublishBatch } from '../../services/BatchRepository';
 
 export const BatchEditorPage = () => {
     const { restoreBatchState, resetBatchState } = useBatchCreateWizardActions();
-    const [publishState, publishBatch] = usePublishBatch();
     const [editItem, setEditItem] = useState({ batchProcesses: [] });
+    const [publishState, publishBatch] = usePublishBatch();
     const [checkedItems, setCheckedItems] = useState([]);
 
     const openEditor = item => setEditItem(item) || restoreBatchState(item, item.batchProcesses);

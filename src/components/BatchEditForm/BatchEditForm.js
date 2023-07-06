@@ -39,7 +39,7 @@ const createProcessFormField = name => (
             hidden
         />
         <Form.Item
-            name={name + "__tid"}
+            name={name + "__sid"}
             children={<Input />}
             rules={[{ required: false }]}
             hidden
@@ -94,7 +94,7 @@ const ProcessForm = ({ processData, onFinish, onCancel, className }) => {
             return (
                 <Form
                     initialValues={processData}
-                    onFinish={data => console.log(data) || onFinish(data)}
+                    onFinish={data => onFinish(data)}
                     className={className}
                     layout='vertical'
                     size='small'
