@@ -42,7 +42,7 @@ const BatchListItemView = ({ item, index: i }) => {
                         <Descriptions.Item label="Publish Time">{dayjs(item.createdOn).format('DD/MM/YYYY hh:mm A')}</Descriptions.Item>
                         <Descriptions.Item label="Current Process">
                             <Space size={6}>
-                                <span>{currentProcess.processId}</span>
+                                <span>{processLabels[currentProcess.processId]}</span>
                                 <span className="process-actions">{currentProcess.activeExecution
                                     ? (currentProcess.activeExecution.endedOn ? <><Button>Start Again</Button><Button>Start Next Process</Button></> : <Button>Stop</Button>)
                                     : <Button>Start</Button>
