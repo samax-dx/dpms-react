@@ -20,6 +20,9 @@ const BatchListItemView = ({ item, index: i }) => {
     const openEditor = item => setEditItem(item) || restoreBatchState(item, item.batchProcesses);
     const closeEditor = () => setEditItem({ batchProcesses: [] }) || resetBatchState();
 
+    const currentProcess = item.batchProcesses.find(process => !process.finished);
+    const startProcess = null;
+
     return (
         <div className={mcss.statusBox}>
             <Space.Compact size={5} align="start" style={{ display: "flex", width: "100%" }} block>
@@ -37,9 +40,20 @@ const BatchListItemView = ({ item, index: i }) => {
                         </Descriptions.Item>
                         <Descriptions.Item label="Batch No">{item.batchId}</Descriptions.Item>
                         <Descriptions.Item label="Publish Time">{dayjs(item.createdOn).format('DD/MM/YYYY hh:mm A')}</Descriptions.Item>
-                        <Descriptions.Item label="Current Process">{item.batchProcesses.find(process => !process.finished).processId}</Descriptions.Item>
-                        <Descriptions.Item label="Started On">-</Descriptions.Item>
-                        <Descriptions.Item label="Machine No">{item.batchProcesses.find(process => !process.finished).machine.machineId}</Descriptions.Item>
+                        <Descriptions.Item label="Current Process">
+                            <Space size={6}>
+                                <span>{currentProcess.processId}</span>
+                                <span className="process-actions">{currentProcess.activeExecution
+                                    ? (currentProcess.activeExecution.endedOn ? <><Button>Start Again</Button><Button>Start Next Process</Button></> : <Button>Stop</Button>)
+                                    : <Button>Start</Button>
+                                }</span>
+                            </Space>
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Start - End">{currentProcess.activeExecution
+                            ? `${currentProcess.activeExecution.startedOn} - ${currentProcess.activeExecution.endedOn}`
+                            : <> - </>
+                        }</Descriptions.Item>
+                        <Descriptions.Item label="Machine No">{currentProcess.machine.machineId}</Descriptions.Item>
                     </Descriptions>
                 </Badge.Ribbon>
                 <div>

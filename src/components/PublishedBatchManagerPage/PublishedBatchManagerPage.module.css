@@ -125,3 +125,10 @@
 .statusBox :global(.process-data .ant-card-body) {
     padding: 1em;
 }
+
+.statusBox :global(.process-actions button) {
+    border-radius: 2px !important;
+    padding: 0 5px;
+    height: auto;
+    color: blue;
+}
