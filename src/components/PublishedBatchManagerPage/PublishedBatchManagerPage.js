@@ -2,26 +2,99 @@ import mcss from './PublishedBatchManagerPage.module.css';
 
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
-import { Badge, Button, Card, Col, Descriptions, Layout, Modal, Row, Space } from 'antd';
+import { Badge, Button, Card, Col, Descriptions, Layout, Modal, Row, Space, notification } from 'antd';
 import { SettingOutlined } from "@ant-design/icons";
 import { BasicLogo } from '../logos/BasicLogo';
 import { HeaderButtonPv } from '../ProfileViewers/HeaderButtonPv';
 import { MainNav } from '../navs/MainNav';
-import { usePublishedBatchList } from '../../services/BatchRepository';
+import { useStopBatchProcess, usePublishedBatchList, useStartBatchProcess, useStartNextBatchProcess } from '../../services/BatchRepository';
 import { processIcons, processLabels } from '../../services/SystemData';
 import { useBatchCreateWizardActions } from '../../services/BatchCreateWizard';
 import { BatchEditForm } from '../BatchEditForm/BatchEditForm';
 
 
 const BatchListItemView = ({ item, index: i }) => {
+    const [processStartState, startBatchProcess] = useStartBatchProcess();
+    const [processNextStartState, startNextBatchProcess] = useStartNextBatchProcess();
+    const [processStopState, stopBatchProcess] = useStopBatchProcess();
     const { restoreBatchState, resetBatchState } = useBatchCreateWizardActions();
     const [editItem, setEditItem] = useState({ batchProcesses: [] });
 
     const openEditor = item => setEditItem(item) || restoreBatchState(item, item.batchProcesses);
     const closeEditor = () => setEditItem({ batchProcesses: [] }) || resetBatchState();
 
-    const currentProcess = item.batchProcesses.find(process => !process.finished);
-    const startProcess = null;
+    const currentProcessIndex = item.batchProcesses.findIndex(process => !process.finished);
+    const currentProcess = item.batchProcesses[currentProcessIndex];
+    const nextProcess = item.batchProcesses[currentProcessIndex + 1];
+    const startProcess = () => startBatchProcess({ batchProcessId: currentProcess.batchProcessId });
+    const startNextProcess = () => startNextBatchProcess({ currentProcessId: currentProcess.batchProcessId, nextProcessId: nextProcess.batchProcessId });
+    const stopProcess = () => stopBatchProcess({ batchProcessId: currentProcess.batchProcessId });
+
+    useEffect(() => {
+        if (!processStartState.complete) return;
+
+        if (processStartState.data instanceof Error) {
+            notification.error({
+                key: `csend_${Date.now()}`,
+                message: "Task Failed",
+                description: <>
+                    Errors:<br />{JSON.stringify(processStartState.data)}
+                </>,
+                duration: 15
+            });
+        } else {
+            notification.success({
+                key: `csend_${Date.now()}`,
+                message: "Task Finished",
+                description: JSON.stringify(processStartState.data),
+                duration: 15,
+            });
+        }
+    }, [processStartState]);
+
+    useEffect(() => {
+        if (!processStopState.complete) return;
+
+        if (processStopState.data instanceof Error) {
+            notification.error({
+                key: `csend_${Date.now()}`,
+                message: "Task Failed",
+                description: <>
+                    Errors:<br />{JSON.stringify(processStopState.data)}
+                </>,
+                duration: 15
+            });
+        } else {
+            notification.success({
+                key: `csend_${Date.now()}`,
+                message: "Task Finished",
+                description: JSON.stringify(processStopState.data),
+                duration: 15,
+            });
+        }
+    }, [processStopState]);
+
+    useEffect(() => {
+        if (!processNextStartState.complete) return;
+
+        if (processNextStartState.data instanceof Error) {
+            notification.error({
+                key: `csend_${Date.now()}`,
+                message: "Task Failed",
+                description: <>
+                    Errors:<br />{JSON.stringify(processNextStartState.data)}
+                </>,
+                duration: 15
+            });
+        } else {
+            notification.success({
+                key: `csend_${Date.now()}`,
+                message: "Task Finished",
+                description: JSON.stringify(processNextStartState.data),
+                duration: 15,
+            });
+        }
+    }, [processNextStartState]);
 
     return (
         <div className={mcss.statusBox}>
@@ -44,8 +117,8 @@ const BatchListItemView = ({ item, index: i }) => {
                             <Space size={6}>
                                 <span>{processLabels[currentProcess.processId]}</span>
                                 <span className="process-actions">{currentProcess.activeExecution
-                                    ? (currentProcess.activeExecution.endedOn ? <><Button>Start Again</Button><Button>Start Next Process</Button></> : <Button>Stop</Button>)
-                                    : <Button>Start</Button>
+                                    ? (currentProcess.activeExecution.endedOn ? <><Button onClick={startProcess}>Start Again</Button><Button onClick={startNextProcess} hidden={!nextProcess}>Start Next Process</Button></> : <Button onClick={stopProcess}>Stop</Button>)
+                                    : <Button onClick={startProcess}>Start</Button>
                                 }</span>
                             </Space>
                         </Descriptions.Item>
@@ -61,8 +134,8 @@ const BatchListItemView = ({ item, index: i }) => {
                         <Row gutter={20}>
                             {item.batchProcesses.map((process, pi) => (
                                 <Col key={pi}>
-                                    <Badge.Ribbon placement="end" text={Math.round(Math.random() * 10)} color="cyan">
-                                        <Card className={`process-data${process.finished ? "" : " is-next"}`} hoverable>
+                                    <Badge.Ribbon placement="end" text={process.executions.length} color="cyan">
+                                        <Card className={`process-data${pi !== currentProcessIndex ? "" : " is-next"}`} hoverable>
                                             <Space direction="vertical" align="center" size={2}>
                                                 {processIcons[process.processId]({})}
                                                 {processLabels[process.processId]}

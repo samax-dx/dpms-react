@@ -22,6 +22,21 @@ const batchSaveState = atom({
     default: { loading: false, complete: false, data: null }
 });
 
+const batchProcessStartState = atom({
+    key: "batchProcessStartState",
+    default: { loading: false, complete: false, data: null }
+});
+
+const batchProcessStopState = atom({
+    key: "batchProcessStopState",
+    default: { loading: false, complete: false, data: null }
+});
+
+const batchNextProcessStartState = atom({
+    key: "batchNextProcessStartState",
+    default: { loading: false, complete: false, data: null }
+});
+
 const queryFilterState = atom({
     key: "QueryFilterState",
     default: null
@@ -198,6 +213,60 @@ export const usePublishBatch = () => {
     return [saveState, async (publishData) => {
         setSaveState({ loading: true, complete: false, data: publishData });
         const response = await axios.post(`${base_url}/publishBatches`, publishData);
+        setSaveState({ loading: false, complete: true, data: response.data });
+
+        setTimeout(() => {
+            setSaveState({ loading: false, complete: false, data: null });
+            setLastWriteState({ time: Date.now() });
+        }, 0);
+
+        return response.data;
+    }];
+};
+
+export const useStartBatchProcess = () => {
+    const [saveState, setSaveState] = useRecoilState(batchProcessStartState);
+    const setLastWriteState = useSetRecoilState(lastWriteState);
+
+    return [saveState, async (publishData) => {
+        setSaveState({ loading: true, complete: false, data: publishData });
+        const response = await axios.post(`${base_url}/startBatchProcess`, publishData);
+        setSaveState({ loading: false, complete: true, data: response.data });
+
+        setTimeout(() => {
+            setSaveState({ loading: false, complete: false, data: null });
+            setLastWriteState({ time: Date.now() });
+        }, 0);
+
+        return response.data;
+    }];
+};
+
+export const useStartNextBatchProcess = () => {
+    const [saveState, setSaveState] = useRecoilState(batchNextProcessStartState);
+    const setLastWriteState = useSetRecoilState(lastWriteState);
+
+    return [saveState, async (publishData) => {
+        setSaveState({ loading: true, complete: false, data: publishData });
+        const response = await axios.post(`${base_url}/startNextBatchProcess`, publishData);
+        setSaveState({ loading: false, complete: true, data: response.data });
+
+        setTimeout(() => {
+            setSaveState({ loading: false, complete: false, data: null });
+            setLastWriteState({ time: Date.now() });
+        }, 0);
+
+        return response.data;
+    }];
+};
+
+export const useStopBatchProcess = () => {
+    const [saveState, setSaveState] = useRecoilState(batchProcessStopState);
+    const setLastWriteState = useSetRecoilState(lastWriteState);
+
+    return [saveState, async (publishData) => {
+        setSaveState({ loading: true, complete: false, data: publishData });
+        const response = await axios.post(`${base_url}/stopBatchProcess`, publishData);
         setSaveState({ loading: false, complete: true, data: response.data });
 
         setTimeout(() => {

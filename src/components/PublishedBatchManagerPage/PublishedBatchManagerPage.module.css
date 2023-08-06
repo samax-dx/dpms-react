@@ -117,7 +117,7 @@
     padding: 2%;
 }
 
-.statusBox :global(.process-data.is-next:not(.ant-col~.ant-col .process-data)) {
+.statusBox :global(.process-data.is-next) {
     border-color: lightgreen;
     background-color: lightcyan;
 }
